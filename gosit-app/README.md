@@ -1,10 +1,16 @@
 # Gosit
 
-> A Web application for observing bus passenger traffics around the City of Seoul
+<br>
+
+> A web application for observing bus passenger traffics around the City of Seoul
+
+<br>
 
 Gosit is an application that shows the amount of passengers who ride buses in the City of Seoul. Riding buses on a daily trip can be a hardcore mission, especially to people who can't afford a car. Since the City of Seoul is notorious for its population density, we often face unpleasant situation when we ride a small bus.
 
 Gosit, wants their users to literally 'go sit'. By leaning on previous statistics, Gosit provides potential passenger density, which allows users to prevent confronting unexpected passenger traffics and thus help them make better plans on their journey.
+
+<br>
 
 ## Development
 
@@ -13,6 +19,8 @@ Gosit is currently built with **ReactJS** and **Python Flask** library. ReactJS 
 - [ReactJS library](https://reactjs.org/)
 - [Flask](http://flask.pocoo.org/)
 
+
+<br>
 
 ## Features
 
