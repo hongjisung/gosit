@@ -1,0 +1,19 @@
+서울 버스 정류장별 일별 url
+http://data.seoul.go.kr/dataList/datasetView.do?infId=OA-12912&srvType=S&serviceKind=1&currentPageNo=1
+
+서울 버스 정류장별 월별, 시간대별 data info url
+http://data.seoul.go.kr/dataList/datasetView.do?infId=OA-12913&srvType=S&serviceKind=1&currentPageNo=1
+
+seoul data url
+http://openapi.seoul.go.kr:8088/(인증키)/xml/CardBusTimeNew/1/5/201511/(노선번호)/ 
+
+1.버스도착정보목록조회:
+http://openapi.gbis.go.kr/ws/rest/busarrivalservice/station?
+serviceKey=키값&stationId=정류소ID
+2.버스도착정보항목조회:
+http://openapi.gbis.go.kr/ws/rest/busarrivalservice?
+serviceKey=키값&stationId=정류소ID
+
+
+
+
