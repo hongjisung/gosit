@@ -12,7 +12,7 @@
   3. 정류장에 한시간에 도착하는 버스 대수를 구하여 한 버스를 이용하는 승객 데이터를 유추한다.
 
 # database
-  mysql? mongodb? sqlite3?
-  일별 이용자수 데이터 비율에 관한 정보 저장
-  data의 csv파일들을 정리해서 저장
+  mysql? mongodb? sqlite3?  
+  일별 이용자수 데이터 비율에 관한 정보 저장  
+  data의 csv파일들을 정리해서 저장  
 
