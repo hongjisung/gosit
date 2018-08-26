@@ -5,7 +5,7 @@ problem with unicode we should use python3 here
 '''
 
 # the data file for push database
-seoulBusFile = pd.rxead_csv('../data/seoulBusData.csv', dtype=str)
+seoulBusFile = pd.read_csv('../data/seoulBusData.csv', dtype=str)
 
 #MySqL connection
 conn = pymysql.connect(host='localhost', user='gosituser', password='', db='gosit', charset='utf8')
