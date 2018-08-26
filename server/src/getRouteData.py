@@ -1,19 +1,11 @@
 import pymysql
 import json
 from collections import OrderedDict
-from flask import Flask, request, url_for, redirect, make_response
-from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)
+
 
 """
-request : bus route number
-response : bus station data of route (station name, station id)
-
-http get method
-url : localhost:5000/busRoute?routeNum={routeNum}
-
+return bus route data by json 
 """
 
 #MySqL connection
@@ -40,23 +32,10 @@ def sendRouteJson(routeNum):
     return json.dumps(resultJson, ensure_ascii=False)
 
 
-# get route number from client
-# name is routeNum
-@app.route('/busRoute', methods=['POST','GET'])
-def busRoute():
-    routeNum = 0
-    if(request.method == 'POST') :
-        routeNum = request.form['routeNum']
-    else :
-        routeNum = request.args.get('routeNum')
-    
+def busRoute(routeNum):
     json_data = sendRouteJson(routeNum)
-    res = make_response(json_data)
-    res.headers['Content-Type'] = 'busRoute'
-    return res
+    return json_data
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 
