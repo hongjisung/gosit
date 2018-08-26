@@ -3,6 +3,7 @@ from flask import url_for, redirect, make_response
 from flask_cors import CORS
 import json
 from src.getRouteData import busRoute
+from src import realtimeBusLocation
 
 app = Flask(__name__)
 CORS(app)
@@ -21,5 +22,17 @@ def findBusRoute():
     res.headers['Content-Type'] = 'findBusRoute/json'
     return res
 
+@app.route('/realtimeData', methods=['POST', 'GET'])
+def realtimeLocation() : 
+    routeNum = 0
+    if(request.method == 'POST'):
+        routeNum = request.form['busId']
+    else :
+        routeNum = request.args.get('busId')
+    json_data = realtimeBusLocation.realtimeLocation(routeNum)
+    res = make_response(json_data)
+    res.headers['Content-Type'] = 'realtimeLoc/json'
+    return res
+
 if __name__ == '__main__':
-    app.run()    
+    app.run(host='0.0.0.0')    
