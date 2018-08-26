@@ -1,0 +1,68 @@
+{request : post, form} 
+{initialCall}
+{  
+    busName  :string
+
+}
+
+{realtimeData}
+{
+    busId : string
+}
+
+{stats}
+{
+    dateType : weekday/weekend (string),
+    hour : int (0~23)
+}
+
+{response}
+{initialCall}
+{
+    status: true/false,
+    busName: string,
+    busId : string
+    busRoute: [
+        {
+            index: 0,
+            stationId : string,
+            stationName : string
+        }
+    ]
+
+    rideWeekdayRatio:[
+        {
+            time : int
+            volume : int
+        }
+    ]
+    
+    rideWeekendRatio:[
+        {
+            time : int
+            volume : int
+        }
+    ]
+}
+
+{realtimeData}
+{
+    busName : string
+    busId : string
+    location : [
+        stationId
+    ]
+}
+
+{stats}
+{
+    busName : string,
+    busId : string,
+    busRoute : [
+        {
+            stationId: string,
+            up : 0/1/2 int,
+            down : 0/1/2 int
+        }
+    ]
+}
