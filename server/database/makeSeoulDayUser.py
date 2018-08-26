@@ -33,6 +33,7 @@ conn = pymysql.connect(host='localhost', user='gosituser', password='', db='gosi
 
 # bus route id and name 
 busIdName = set()
+busStation = set()
 
 # bring the bus route id and name
 with conn.cursor() as curs:
@@ -42,12 +43,14 @@ with conn.cursor() as curs:
     rs = curs.fetchall()
     for row in rs:
         busIdName.add((row[0], row[1]))
+        busStation.add((row[0], row[1], row[4],row[5]))
 
 # 0,0 week day ride, 0,1 week day alight
 # 1,0 weekend ride, 1,1 weekend alight
 inputlist = [[0,0],[0,0]]
+
 busDict = dict()
-for bus in busIdName:
+for bus in busStation:
     busDict[bus] = deepcopy(inputlist)
 print(len(busIdName))
 
@@ -71,12 +74,13 @@ for year in years:
             ymd = year+month+day
 
             # start from not done 
-            if(ymd<='20171026') :
+            if(ymd<='20170101') :
                 startTheDay+=1
                 continue
             
 
             # record the number of users from url
+            
             for bus in busIdName:
                 userqueryParams = ymd+'/'+quote(bus[1])+'/'
                 try : 
@@ -86,50 +90,58 @@ for year in years:
                     print(userUrl+userqueryParams)
                     continue
 
-                rideList = [int(rpn.firstChild.data) for rpn in dombus.getElementsByTagName('RIDE_PASGR_NUM') if int(rpn.firstChild.data) >0]
-                alightList = [int(apn.firstChild.data) for apn in dombus.getElementsByTagName('ALIGHT_PASGR_NUM') if int(apn.firstChild.data)>0]
-                if (intday in holidays) or startTheDay%7==0 or startTheDay%7==6 :
-                    # update sql so += => =
-                    busDict[bus][1][0] = sum(rideList)
-                    busDict[bus][1][1] = sum(alightList)
-                else :
-                    busDict[bus][0][0] = sum(rideList)
-                    busDict[bus][0][1] = sum(alightList)
+                rideList = [int(rpn.firstChild.data) for rpn in dombus.getElementsByTagName('RIDE_PASGR_NUM')]
+                alightList = [int(apn.firstChild.data) for apn in dombus.getElementsByTagName('ALIGHT_PASGR_NUM') ]
+                staIdList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('STND_BSST_ID') ]
+                staNameList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('BUS_STA_NM') ]
+                
+                for i in range(len(staIdList)):
+                    busst = (bus[0],bus[1],staIdList[i], staNameList[i])
+                    if( busst not in busStation):
+                        continue;
+                    if (intday in holidays) or startTheDay%7==0 or startTheDay%7==6 :
+                        # update sql so += => =
+                        busDict[busst][1][0] = rideList[i]
+                        busDict[busst][1][1] = alightList[i]
+                    else :
+                        busDict[busst][0][0] = rideList[i]
+                        busDict[busst][0][1] = alightList[i]
             
             # each day save the record to database
             with conn.cursor() as curs:
                 curs.execute("set names utf8")
-                sqlselect = """select count(*) from ratiouser """
+                sqlselect = """select count(*) from ratioBusStationuser """
                 curs.execute(sqlselect)
                 # insert sql if the table is empty
                 if curs.fetchall()[0][0] == 0:
                     curs2 = conn.cursor()
-                    sqlpushratio = """insert into ratioUser(routeId, routeName,weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
-                                values (%s,%s, %s, %s, %s, %s) """
-                    for bus in busIdName:
-                        curs2.execute(sqlpushratio, (bus[0], bus[1], busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
+                    sqlpushratio = """insert into ratioBusStationUser(routeId, routeName,stationId, stationName,weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
+                                values (%s,%s, %s, %s, %s, %s,%s,%s) """
+                    for bus in busStation:
+                        curs2.execute(sqlpushratio, (bus[0], bus[1], bus[2],bus[3],busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
                     conn.commit()
                 # update sql if the table if full
                 else :
                     curs2 = conn.cursor()
-                    sqlupdate = """update ratioUser 
+                    sqlupdate = """update ratioBusStationUser 
                                 set weekDayRideRatio = %s, weekDayAlightRatio = %s, weekendRideRatio = %s, weekendAlightRatio = %s
-                                where routeId = %s"""
-                    sqlgetdata ="""select * from ratiouser where routeId = %s"""
+                                where routeId = %s, stationId = %s"""
+                    sqlgetdata ="""select * from ratioBusStationuser where routeId = %s and stationId = %s"""
                     for bus in busIdName:
-                        curs2.execute(sqlgetdata, (bus[0]))
-                        fourdata = [i for i in curs2.fetchall()[0][2:]]
+                        curs2.execute(sqlgetdata, (bus[0], bus[2]))
+                        fourdata = [i for i in curs2.fetchall()[0][4:]]
                         curs2.execute(sqlupdate, (fourdata[0] + busDict[bus][0][0], \
                                                 fourdata[1] + busDict[bus][0][1],
                                                 fourdata[2] + busDict[bus][1][0],
                                                 fourdata[3] + busDict[bus][1][1],
-                                                bus[0]))
+                                                bus[0],
+                                                bus[2]))
                     conn.commit()
 
             
             # record about the registered day
             # file for record about the days registered to db
-            dayrecord = open('../data/dayrecord.use', mode = 'a')
+            dayrecord = open('../data/dayrecord2.use', mode = 'a')
             
             if (intday in holidays) or startTheDay%7==0 or startTheDay%7==6 :
                 dayrecord.write(ymd+' weekend\n')
