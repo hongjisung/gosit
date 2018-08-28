@@ -74,7 +74,7 @@ for year in years:
             ymd = year+month+day
 
             # start from not done 
-            if(ymd<='20170101') :
+            if(ymd<='20170510') :
                 startTheDay+=1
                 continue
             
@@ -98,7 +98,7 @@ for year in years:
                 for i in range(len(staIdList)):
                     busst = (bus[0],bus[1],staIdList[i], staNameList[i])
                     if( busst not in busStation):
-                        continue;
+                        continue
                     if (intday in holidays) or startTheDay%7==0 or startTheDay%7==6 :
                         # update sql so += => =
                         busDict[busst][1][0] = rideList[i]
@@ -115,21 +115,21 @@ for year in years:
                 # insert sql if the table is empty
                 if curs.fetchall()[0][0] == 0:
                     curs2 = conn.cursor()
-                    sqlpushratio = """insert into ratioBusStationUser(routeId, routeName,stationId, stationName,weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
-                                values (%s,%s, %s, %s, %s, %s,%s,%s) """
+                    sqlpushratio = """insert into ratioBusStationUser(routeId, stationId, weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
+                                values (%s,%s, %s, %s,%s,%s) """
                     for bus in busStation:
-                        curs2.execute(sqlpushratio, (bus[0], bus[1], bus[2],bus[3],busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
+                        curs2.execute(sqlpushratio, (bus[0], bus[2], busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
                     conn.commit()
                 # update sql if the table if full
                 else :
                     curs2 = conn.cursor()
                     sqlupdate = """update ratioBusStationUser 
                                 set weekDayRideRatio = %s, weekDayAlightRatio = %s, weekendRideRatio = %s, weekendAlightRatio = %s
-                                where routeId = %s, stationId = %s"""
+                                where routeId = %s and stationId = %s"""
                     sqlgetdata ="""select * from ratioBusStationuser where routeId = %s and stationId = %s"""
-                    for bus in busIdName:
+                    for bus in busStation:
                         curs2.execute(sqlgetdata, (bus[0], bus[2]))
-                        fourdata = [i for i in curs2.fetchall()[0][4:]]
+                        fourdata = [i for i in curs2.fetchall()[0][2:]]
                         curs2.execute(sqlupdate, (fourdata[0] + busDict[bus][0][0], \
                                                 fourdata[1] + busDict[bus][0][1],
                                                 fourdata[2] + busDict[bus][1][0],

@@ -18,6 +18,7 @@ sql = """insert into
         seoulBusData(routeId, routeName , routeOrder , sectionId ,stationId ,stationName ,xPos,yPos) 
         values(%s, %s, %s, %s, %s, %s, %s, %s)"""
 
+
 for idx in seoulBusFile.index:
     print(tuple(seoulBusFile.iloc[idx]))
     curs.execute(sql, tuple(seoulBusFile.iloc[idx]))
