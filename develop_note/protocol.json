@@ -7,7 +7,7 @@
 
 {realtimeData}
 {
-    busId : string
+    busName : string
 }
 
 {stats}
