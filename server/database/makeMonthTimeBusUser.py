@@ -24,16 +24,20 @@ months = [str(i) for i in range(1,13)]
 
 # get the routeId to search
 busInfoList = set()
+busStation = set()
 with conn.cursor() as curs:
     curs.execute('set names utf8')
-    sql = """ select routeId, routeName from seoulBusData"""
+    sql = """ select * from seoulBusData"""
     curs.execute(sql)
     for row in curs.fetchall():
         busInfoList.add((row[0], row[1]))
+        busStation.add((row[0],row[2],row[4],row[6]))
 
 templist = [0 for i in range(48)]
 # key is (routeId, stationId)
 busDict = {}
+for bus in busStation:
+    busDict[bus] = deepcopy(templist)
 
 
 # url the number of bus users per month of given bus route number 
@@ -55,43 +59,65 @@ for year in years:
 
         for busInfo in busInfoList:
             url = urlbase+ym+'/'+quote_plus(busInfo[1])+'/'
-            try : 
-                #print(url)
+
+            busKeyList=[]
+            visited = []
+            for k in busStation:
+                if(k[0] == busInfo[0]):
+                    busKeyList += [k]
+                    visited +=[0]
+            
+            try :
                 dataxml = urlopen(url)
                 dom = minidom.parse(dataxml)
-                rowList = dom.getElementsByTagName('row')
-                for row in rowList:
-                    staId = row.getElementsByTagName('STND_BSST_ID')[0].firstChild.data
-                    buskey = (busInfo[0], staId) 
-                    for i in range(24):
-                        ridetagname = time_dict[i] + motion_dict['ride']
-                        rideuserdata = row.getElementsByTagName(ridetagname)[0].firstChild.data
-                        alighttagname = time_dict[i] + motion_dict['alight']
-                        alightuserdata = row.getElementsByTagName(alighttagname)[0].firstChild.data
-                        if buskey in busDict.keys():
-                            busDict[buskey][i] += int(rideuserdata)
-                            busDict[buskey][i+24] += int(alightuserdata)
-                        else : 
-                            busDict[buskey] = deepcopy(templist)
-                            busDict[buskey][i] += int(rideuserdata)
-                            busDict[buskey][i+24] += int(alightuserdata)
             except :
                 print(url)
+
+            rowList = dom.getElementsByTagName('row')
+            for row in rowList:
+                staId = row.getElementsByTagName('STND_BSST_ID')[0].firstChild.data
+                arsId = row.getElementsByTagName('BSST_ARS_NO')[0].firstChild.data
+                    
+                buskey = set()
+                for i in range(len(busKeyList)):
+                    if len(arsId)>4 and busKeyList[i][3] == arsId and visited[i] == 0:
+                        buskey = busKeyList[i]
+                        visited[i] = 1
+                        break
+                    elif busKeyList[i][2] == staId and visited[i] ==0:
+                        buskey = busKeyList[i]
+                        visited[i] = 1
+                        break
+                
+                if buskey not in busStation:
+                    f = open('../data/diffStationInfo.txt', 'a')
+                    f.write(busInfo[0]+' ' +busInfo[1]+ ' '+staId+ ' '+arsId+ '\n')
+                    f.close()
+                    continue
+
+
+                for i in range(24):
+                    ridetagname = time_dict[i] + motion_dict['ride']
+                    rideuserdata = row.getElementsByTagName(ridetagname)[0].firstChild.data
+                    alighttagname = time_dict[i] + motion_dict['alight']
+                    alightuserdata = row.getElementsByTagName(alighttagname)[0].firstChild.data
+                    busDict[buskey][i] += int(rideuserdata)
+                    busDict[buskey][i+24] += int(alightuserdata)
+            
 
 
 # push data to database
 with conn.cursor() as curs:
     curs.execute('set names utf8')
     sql = """insert into monthtimebususer values
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+            (%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
             %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
     for key in busDict.keys():
         insertdata = key + tuple(busDict[key])
         curs.execute(sql, insertdata)
     conn.commit()
+
 
 #close sql connect
 conn.close()

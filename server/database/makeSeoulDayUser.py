@@ -32,7 +32,7 @@ days = [31,28,31,30,31,30,31,31,30,31,30,31]
 conn = pymysql.connect(host='localhost', user='gosituser', password='', db='gosit', charset='utf8')
 
 # bus route id and name 
-busIdName = set()
+busRoute = set()
 busStation = set()
 
 # bring the bus route id and name
@@ -42,8 +42,9 @@ with conn.cursor() as curs:
     curs.execute(sqlGetBusData)
     rs = curs.fetchall()
     for row in rs:
-        busIdName.add((row[0], row[1]))
-        busStation.add((row[0], row[1], row[4],row[5]))
+        busRoute.add((row[0],row[1]))
+        # id, order, stid, ars
+        busStation.add((row[0], row[2],row[4],row[6]))
 
 # 0,0 week day ride, 0,1 week day alight
 # 1,0 weekend ride, 1,1 weekend alight
@@ -52,7 +53,7 @@ inputlist = [[0,0],[0,0]]
 busDict = dict()
 for bus in busStation:
     busDict[bus] = deepcopy(inputlist)
-print(len(busIdName))
+print(len(busRoute))
 
 
 # get bus route number users per day
@@ -74,14 +75,14 @@ for year in years:
             ymd = year+month+day
 
             # start from not done 
-            if(ymd<='20170510') :
+            if(ymd<='20170819') :
                 startTheDay+=1
                 continue
             
 
             # record the number of users from url
             
-            for bus in busIdName:
+            for bus in busRoute:
                 userqueryParams = ymd+'/'+quote(bus[1])+'/'
                 try : 
                     getuserurl = urlopen(userUrl + userqueryParams)
@@ -93,19 +94,39 @@ for year in years:
                 rideList = [int(rpn.firstChild.data) for rpn in dombus.getElementsByTagName('RIDE_PASGR_NUM')]
                 alightList = [int(apn.firstChild.data) for apn in dombus.getElementsByTagName('ALIGHT_PASGR_NUM') ]
                 staIdList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('STND_BSST_ID') ]
-                staNameList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('BUS_STA_NM') ]
+                arsIdList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('BSST_ARS_NO')]
+                #staNameList = [rpn.firstChild.data for rpn in dombus.getElementsByTagName('BUS_STA_NM') ]
                 
+                #busRouteID에 해당해는 busStation key list
+                busKeyList=[]
+                visited = []
+                for k in busStation:
+                    if(k[0] == bus[0]):
+                        busKeyList += [k]
+                        visited +=[0]
+                
+
                 for i in range(len(staIdList)):
-                    busst = (bus[0],bus[1],staIdList[i], staNameList[i])
+                    busst = set()
+                    for j in range(len(busKeyList)):
+                        if len(arsIdList[i])>4 and arsIdList[i] == busKeyList[j][3] and visited[j]==0:
+                            busst=busKeyList[j]
+                            visited[j]=1
+                            break
+                        elif busKeyList[j][2] == staIdList[i] and visited[j] == 0:
+                            busst = busKeyList[j]
+                            visited[j] = 1
+                            break
+
                     if( busst not in busStation):
                         continue
                     if (intday in holidays) or startTheDay%7==0 or startTheDay%7==6 :
                         # update sql so += => =
-                        busDict[busst][1][0] = rideList[i]
-                        busDict[busst][1][1] = alightList[i]
+                        busDict[busst][1][0] = rideList[i] if rideList[i]>0 else 0
+                        busDict[busst][1][1] = alightList[i] if alightList[i]>0 else 0
                     else :
-                        busDict[busst][0][0] = rideList[i]
-                        busDict[busst][0][1] = alightList[i]
+                        busDict[busst][0][0] = rideList[i] if rideList[i]>0 else 0
+                        busDict[busst][0][1] = alightList[i] if alightList[i]>0 else 0
             
             # each day save the record to database
             with conn.cursor() as curs:
@@ -115,27 +136,27 @@ for year in years:
                 # insert sql if the table is empty
                 if curs.fetchall()[0][0] == 0:
                     curs2 = conn.cursor()
-                    sqlpushratio = """insert into ratioBusStationUser(routeId, stationId, weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
-                                values (%s,%s, %s, %s,%s,%s) """
+                    sqlpushratio = """insert into ratioBusStationUser(routeId, routeOrder, stationId, arsId,weekDayRideRatio, weekDayAlightRatio,weekendRideRatio, weekendAlightRatio)
+                                values (%s,%s, %s,%s,%s, %s,%s,%s) """
                     for bus in busStation:
-                        curs2.execute(sqlpushratio, (bus[0], bus[2], busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
+                        curs2.execute(sqlpushratio, (bus[0], bus[1],bus[2], bus[3],busDict[bus][0][0], busDict[bus][0][1],busDict[bus][1][0],busDict[bus][1][1]))
                     conn.commit()
                 # update sql if the table if full
                 else :
                     curs2 = conn.cursor()
                     sqlupdate = """update ratioBusStationUser 
                                 set weekDayRideRatio = %s, weekDayAlightRatio = %s, weekendRideRatio = %s, weekendAlightRatio = %s
-                                where routeId = %s and stationId = %s"""
-                    sqlgetdata ="""select * from ratioBusStationuser where routeId = %s and stationId = %s"""
+                                where routeId = %s and routeOrder = %s and stationId = %s and arsId=%s"""
+                    sqlgetdata ="""select * from ratioBusStationuser where routeId = %s and routeOrder = %s and stationId = %s and arsId=%s"""
                     for bus in busStation:
-                        curs2.execute(sqlgetdata, (bus[0], bus[2]))
-                        fourdata = [i for i in curs2.fetchall()[0][2:]]
+                        curs2.execute(sqlgetdata, bus)
+                        fourdata = [i for i in curs2.fetchall()[0][4:]]
                         curs2.execute(sqlupdate, (fourdata[0] + busDict[bus][0][0], \
-                                                fourdata[1] + busDict[bus][0][1],
-                                                fourdata[2] + busDict[bus][1][0],
-                                                fourdata[3] + busDict[bus][1][1],
-                                                bus[0],
-                                                bus[2]))
+                                                fourdata[1] + busDict[bus][0][1],\
+                                                fourdata[2] + busDict[bus][1][0],\
+                                                fourdata[3] + busDict[bus][1][1],\
+                                                bus[0],bus[1],\
+                                                bus[2],bus[3]))
                     conn.commit()
 
             
