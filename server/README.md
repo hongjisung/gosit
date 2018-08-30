@@ -7,6 +7,12 @@
   db table create file  
   db table make from api and url file 
 
+# database 이전
+  http://blog.naver.com/PostView.nhn?blogId=sweety2407&logNo=130032891626
+  ./data/gosit.sql : made by mysqldump  
+  command : mysql -u root -p {db_name} < gosit.sql
+  
+
 # route.py  
   실행할 flask server file  
   
