@@ -1,0 +1,40 @@
+how to get statistical high or low
+
+protocol stats 에서 보여줄 up, down
+
+1. busCnt : 현재 운행중인 버스의 총 개수.
+2. stCnt : 버스 노선의 정류장 개수.
+3. upCnt : 그 시간대의 승차인원
+4. downCnt : 그 시간대의 하차인원
+5. p : 평일에 타는 승객 비율
+6. weekdayCnt , weekendCnt
+
+stCnt / busCnt  : 버스 사이에 정거장 개수
+한 정거장 사이의 시간 : 약 1분 30초
+
+시간당 탑승 인원
+upCnt * p  / weekdayCnt
+
+한 버스당 탑승 인원 유추
+upCnt * p / weekdayCnt / ( 3600 / (90*stCnt/busCnt))
+= upCnt * p  stCnt / (busCnt *40* weekdayCnt)
+
+
+얼마일때 적은 것이고 얼마일때 많은 것인가
+
+
+protocol initicalCall에서 보여줄 ratio
+
+rideWeekdayRatio, rideWeekendRatio를 어떻게 구할 것인가(이용객이므로 승차만 고려)
+버스에 대해서 db에서 평일/휴일 이용객 전체 수를 구한다.
+버스에 대해서 db에서 시간대별 이용객 전체 수(1년간)를 구한다.
+버스에 대해서 dayrecord.use에서 1년간 평일/휴일 개수를 구한다.
+
+시간대별 평일 이용객 수
+평일 전체 이용객 수 * (그 시간대 이용객 수/전체 이용객수) / 평일의 수 
+
+시간대별 휴일 이용객 수
+휴일 전체 이용객 수 * (그 시간대 이용객 수/전체 이용객수) / 휴일의 수 
+
+
+

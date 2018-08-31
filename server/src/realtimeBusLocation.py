@@ -9,35 +9,47 @@ import json
 버스 노선번호를 받아와 api를 이용하여 버스의 실시간위치정보를 반환한다.
 '''
 def makeLocJson(routeNum):
-    urlbase = 'http://ws.bus.go.kr/api/rest/buspos/getBusPosByRtid?ServiceKey='
-    key = open('./data/realtimeBusAuthKey.use').read().strip()
-    option = '&busRouteId='
-
     resultJson = OrderedDict()
-    resultJson["busName"] = routeNum
     conn = pymysql.connect(host='localhost', user='gosituser', password='', db='gosit', charset='utf8')
+    
+    numcheckSql = """select * from seoulBusData where routeName = %s """
     with conn.cursor() as curs:
-        sql = """ select * from seoulbusdata where routeName = %s"""
-        curs.execute(sql, (routeNum))
-        for row in curs.fetchall():
-            busRouteId = row[0]
-            resultJson["busId"] = busRouteId
-            resultJson["location"] = []
+        curs.execute("set names utf8")
+        curs.execute(numcheckSql, (routeNum))
+        if len(curs.fetchall()) == 0:
+            resultJson["status"] = False
+            return json.dumps(resultJson, ensure_ascii=False)        
+        else:
+            resultJson["status"] = True
+            resultJson["busName"] = routeNum
+            curs.execute(numcheckSql, (routeNum))
+            for row in curs.fetchall():
+                resultJson["busId"] = row[0]
+    
+    resultJson["location"] = []
+    urlbase='http://210.96.13.82:8099/api/rest/buspos/getBusPosByRtid.jsonp?busRouteId='
+    
+    url = urlbase + resultJson["busId"]
+    urldata = urlopen(url)
+    jsontext = urldata.read().decode('utf8')[5:-1]
+    jsondata = json.loads(jsontext)
+    if(jsondata['outBusPosByRtid']['msgHeader']['headerMsg'] == "결과가 없습니다."):
+        print(routeNum)
+        print('no result')
+        f = open('./data/noRouteId.use', mode = 'a')
+        f.write(routeNum +' no result\n')
+        f.close()
+        resultJson['status'] = False
+        return  json.dumps(resultJson, ensure_ascii=False)
 
-            url = urlbase+key+option+busRouteId
-            realtimeurl = urlopen(url)
-            dom = minidom.parse(realtimeurl)
-            nowLocs = [nl.firstChild.data for nl in dom.getElementsByTagName('sectionId')]
-            curs2 = conn.cursor()
-            sql2 = """ select * from seoulbusdata where routeId = %s and sectionId = %s"""
-            for staId in nowLocs:
-                curs2.execute(sql2, (busRouteId, staId))
-                
-                for bsdata in curs2.fetchall():
-                    if len(bsdata) >4:
-                        resultJson["location"] += [bsdata[4]]
-
-            break
+    for item in jsondata['outBusPosByRtid']['msgBody']['itemList']:
+        findstIdsql = """ select stationId from seoulbusdata where routeId = %s and sectionId = %s"""
+        stationId = ''
+        with conn.cursor() as curs2:
+            curs2.execute(findstIdsql, (resultJson["busId"], item['sectionId']))
+            for row2 in curs2.fetchall():
+                stationId = row2[0]
+        resultJson['location'] +=[stationId]
 
     return json.dumps(resultJson, ensure_ascii=False)
 

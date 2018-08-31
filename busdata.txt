@@ -1,3 +1,10 @@
+최신 버스 노선 정보를 bus.go.kr을 통해
+http://210.96.13.82:8099/api/rest/busRouteInfo/getStaionByRoute.jsonp?busRouteId=100100400
+
+버스 실시간 위치를 bus.go.kr을 통해
+http://210.96.13.82:8099/api/rest/buspos/getBusPosByRtid.jsonp?busRouteId=100100400
+
+
 서울 버스 정류장별 일별 url
 http://data.seoul.go.kr/dataList/datasetView.do?infId=OA-12912&srvType=S&serviceKind=1&currentPageNo=1
 
