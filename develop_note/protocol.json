@@ -17,6 +17,13 @@
     hour : int (0~23)
 }
 
+{stationInfo}
+{
+    stationId : string
+}
+
+
+
 {response}
 {initialCall}
 {
@@ -27,7 +34,8 @@
         {
             index: 0,
             stationId : string,
-            stationName : string
+            stationName : string,
+            arsId : string
         }
     ]
 
@@ -67,3 +75,18 @@
         }
     ]
 }
+
+{stationInfo}
+{
+    stationId : string
+    arrivalBusInfo : [
+        {
+            routeId: string
+            firstBefoBusInfo : string(state) ex) 출발대기, 4분43초후[3번째 전]
+            secondBefoBusInfo : string(state) ex) 출발대기, 4분43초후[3번째 전]
+        }
+    ]
+}
+
+
+

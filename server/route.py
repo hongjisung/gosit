@@ -3,7 +3,7 @@ from flask import url_for, redirect, make_response
 from flask_cors import CORS
 import json
 from src import initialBusCall, realtimeBusLocation
-from src import statsBus
+from src import statsBus, stationBusInfo
 
 
 app = Flask(__name__)
@@ -56,6 +56,17 @@ def stats() :
     res.headers['Content-Type'] = 'stats/json'
     return res
 
+@app.route('/stationInfo', methods = ['POST', 'GET'])
+def stationInfo():
+    stationId = 0
+    if(request.method == 'POST'):
+        stationId = request.form['stationId']
+    else :
+        stationId = request.args.get('stationId')
+    json_data = stationBusInfo.stationInfo(stationId)
+    res = make_response(json_data)
+    res.headers['Content-Type'] = 'stationInfo/json'
+    return res; 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')    
