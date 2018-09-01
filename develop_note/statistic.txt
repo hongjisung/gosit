@@ -16,8 +16,8 @@ stCnt / busCnt  : 버스 사이에 정거장 개수
 upCnt * p  / weekdayCnt
 
 한 버스당 탑승 인원 유추
-upCnt * p / weekdayCnt / ( 3600 / (90*stCnt/busCnt))
-= upCnt * p  stCnt / (busCnt *40* weekdayCnt)
+upCnt * p / weekdayCnt / ( 3600 / (120*stCnt/busCnt))
+= upCnt * p  stCnt / (busCnt *30* weekdayCnt)
 
 
 얼마일때 적은 것이고 얼마일때 많은 것인가

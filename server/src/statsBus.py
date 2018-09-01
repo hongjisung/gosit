@@ -26,8 +26,8 @@ stCnt / busCnt  : 버스 사이에 정거장 개수
 upCnt * p  / weekdayCnt
 
 한 버스당 탑승 인원 유추
-upCnt * p / weekdayCnt / ( 3600 / (90*stCnt/busCnt))
-= upCnt * p  stCnt / (busCnt *40* weekdayCnt) 
+upCnt * p / weekdayCnt / ( 3600 / (120*stCnt/busCnt))
+= upCnt * p  stCnt / (busCnt *30* weekdayCnt) 
 
 
 얼마일때 적은 것이고 얼마일때 많은 것인가
@@ -157,11 +157,11 @@ def makeStatsJson(routeNum, dayType, hour):
         upRatio = 0.0
         downRatio = 0.0
         if dayType == 'weekday':
-            upRatio = rideCnt * propRide *(staCount / busCount) / weekdayCnt / 40.0
-            downRatio = alightCnt * propAlight *(staCount / busCount) / weekdayCnt /40.0
+            upRatio = rideCnt * propRide *(staCount / busCount) / weekdayCnt / 30.0
+            downRatio = alightCnt * propAlight *(staCount / busCount) / weekdayCnt /30.0
         else:    
-            upRatio = rideCnt * propRide *(staCount / busCount) / weekendCnt / 40.0
-            downRatio = alightCnt * propAlight *(staCount / busCount) / weekendCnt /40.0
+            upRatio = rideCnt * propRide *(staCount / busCount) / weekendCnt / 30.0
+            downRatio = alightCnt * propAlight *(staCount / busCount) / weekendCnt /30.0
         
         routeDict['up'] = upRatio
         routeDict['down'] = downRatio
