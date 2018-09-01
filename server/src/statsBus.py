@@ -43,7 +43,7 @@ def makeStatsJson(routeNum, dayType, hour):
     resultJson['busName'] = routeNum
 
     # find busId
-    findBusIdsql = """ select distinct routeId from seoulbusdata where routeName=%s order by routeOrder"""
+    findBusIdsql = """ select distinct routeId, routeOrder from seoulbusdata where routeName=%s order by routeOrder"""
     with conn.cursor() as curs:
         curs.execute(findBusIdsql, (routeNum))
         resultJson['busId'] = ''
