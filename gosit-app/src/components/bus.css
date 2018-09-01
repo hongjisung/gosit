@@ -1,0 +1,67 @@
+.BusPage {
+    width: 850px;
+    margin: 120px auto;
+}
+
+.BusPage .top-holder {
+    width: 850px;
+}
+
+.BusPage .top-holder img {
+    width: 120px;
+}
+
+.BusPage .stat-chart {
+    width: 850px;
+    height: 300px;
+}
+
+.BusPage .station-holder {
+    width: 850px;
+    margin-top: 80px;
+    padding-top: 10px;
+    border-top: 4px solid #ddd;
+}
+
+.BusPage .station-holder .station {
+    position: relative;
+    width: 850px;
+    height: 70px;
+}
+
+
+.BusPage .station .line {
+    position: absolute;
+    left: 50px;
+    width: 5px;
+    height: 70px;
+    background: #8ad9e3;
+}
+
+.BusPage .station .circle {
+    position: absolute;
+    top: 27px;
+    left: 45px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #bfeaf0;
+}
+
+.BusPage .station .station-index {
+    position: absolute;
+    line-height: 70px;    
+    left: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #eee;
+}
+
+.BusPage .station .station-name {
+    position: absolute;
+    left: 120px;
+    font-size: 24px;
+    line-height: 70px;
+    font-family: "Jeju Gothic";
+    color: #eee;
+}
