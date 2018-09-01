@@ -1,0 +1,83 @@
+.landing-container {
+    position: absolute;
+    width: 850px;
+    height: 190px;
+    margin-left: -425px;
+    margin-top: -95px;
+    left: 50%;
+    top: 50%;
+}
+
+
+.LogoHolder {
+    float: left;
+    width: 300px;
+}
+
+.LogoHolder img {
+    width: 300px;
+}
+
+.SearchHolder {
+    float: left;
+    width: 545px;
+    height: 190px;
+    margin-bottom: -8px;
+}
+
+.SearchHolder .title {
+    width: 545px;
+    font-size: 60px;
+    font-family: inherit;
+    color: #fff;
+    height: 80px;
+    text-align: justify;
+    text-align-last: justify;
+    overflow: hidden;
+}
+
+.SearchHolder .description {
+    text-align: right;
+    width: 545px;
+    font-size: 22px;
+    color: #ddd;
+    font-family: inherit;
+}
+
+.SearchHolder .search-input {
+    position: absolute;
+    float: left;
+    font-family: inherit;
+    bottom: -5px;
+    width: 545px !important;
+    font-size: 24px !important;
+    color: #fff;
+    border-bottom: 1px solid #eee !important;
+}
+
+.SearchHolder .search-input:focus + label {
+    color: #eee !important;
+}
+
+.SearchHolder .search-input:focus {
+    border-bottom: 1px solid #eee !important;
+    box-shadow: 0 1px 0 0 #eee !important;
+}
+
+.SearchHolder .search-btn {
+    position: absolute;
+    font-size: 36px;
+    bottom: 20px;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    -webkit-transition: color 0.5s;
+    transition: color 0.5s;
+    color: #ddd;
+}
+
+.SearchHolder .search-btn:hover {    
+    font-weight: bold;
+    color: #fff;
+}
