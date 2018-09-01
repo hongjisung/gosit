@@ -13,7 +13,7 @@
 {stats}
 {
     busName : string
-    dateType : weekday/weekend (string),
+    dayType : weekday/weekend (string),
     hour : int (0~23)
 }
 
