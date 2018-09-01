@@ -1,49 +1,62 @@
 import React, { Component } from 'react';
 import "./gosit.css";
-import img_landing_logo from '../img/gosit_landing.png';
+import LandingPage from './landing';
+import BusPage from './bus';
+import axios from 'axios';
 
 class Gosit extends Component {
-  render() 
+  constructor(props)
   {
-    return (
-      <div className="landing-container">
-        <LogoHolder />
-        <SearchHolder />
-      </div>
-      );
-  }
-}
+    super(props);
+    this.state = {
+      page: 'landing',
+      busName: '',
+      busRoute: ''
+    }
 
-class LogoHolder extends Component {
+    this.busDataHTML = "";
+  }
+
+  getBusData = () => {
+    return this.state;
+  }
+
+  loadBusPage = (busName) => {
+    axios.get('http://35.229.154.169/initialCall', {
+      params: {
+        busName: busName
+      }
+    })
+      .then(res => {
+        var response = JSON.parse(res.request.response);
+        if(response.status == true) {
+          this.setState({
+            busName: response.busName,
+            busId: response.busId,
+            busRoute: response.busRoute
+          })
+        }
+        this.setState({
+          page: 'bus'
+        });
+    });
+
+  }
+
   render()
   {
-    return (
-      <div className="LogoHolder">
-        <img src={img_landing_logo} />
-      </div>
-      )
+    switch(this.state.page)
+    {
+      case 'landing':
+        return <LandingPage loadBusPage={this.loadBusPage} />
+      case 'bus':
+        return <BusPage getBusData={this.getBusData}
+               />
+      default:
+        return <div />
+    }
   }
-}
 
-class SearchHolder extends Component{
-  render()
-  {
-    return (
-      <div className="SearchHolder">
-          <div className="title">
-            Go Sit : 앉아서 가자
-          </div>
-          <div className="description">
-            서울 버스별 승하차 인원 분석 툴
-          </div>
-          <input type="text"
-                 className="search-input"
-                 maxlength="22"
-                 placeholder="오늘 그대가 타고갈 버스는?"/>
-          <i class="fa fa-angle-right search-btn"></i>
-      </div>
-      )
-  }
 }
-
+ 
 export default Gosit;

@@ -1,4 +1,4 @@
-.container-landing {
+.LandingPage {
     position: absolute;
     width: 850px;
     height: 190px;
@@ -8,34 +8,29 @@
     top: 50%;
 }
 
-.container-main {
-    width: 850px;
-    margin: 100px auto;
-}
-
-.TopContainer {
+.LandingPage .TopContainer {
     position: relative;
     width: 850px;
     height: 190px;
 }
 
-.LogoHolder {
+.LandingPage .LogoHolder {
     float: left;
     width: 300px;
 }
 
-.LogoHolder img {
+.LandingPage .LogoHolder img {
     width: 300px;
 }
 
-.SearchHolder {
+.LandingPage .SearchHolder {
     float: left;
     width: 545px;
     height: 190px;
     margin-bottom: -8px;
 }
 
-.SearchHolder .title {
+.LandingPage .SearchHolder .title {
     width: 545px;
     font-size: 60px;
     font-family: inherit;
@@ -46,7 +41,7 @@
     overflow: hidden;
 }
 
-.SearchHolder .description {
+.LandingPage .SearchHolder .description {
     text-align: right;
     width: 545px;
     font-size: 22px;
@@ -54,7 +49,7 @@
     font-family: inherit;
 }
 
-.SearchHolder .search-input {
+.LandingPage .SearchHolder .search-input {
     position: absolute;
     float: left;
     font-family: inherit;
@@ -65,16 +60,16 @@
     border-bottom: 1px solid #eee !important;
 }
 
-.SearchHolder .search-input:focus + label {
+.LandingPage .SearchHolder .search-input:focus + label {
     color: #eee !important;
 }
 
-.SearchHolder .search-input:focus {
+.LandingPage .SearchHolder .search-input:focus {
     border-bottom: 1px solid #eee !important;
     box-shadow: 0 1px 0 0 #eee !important;
 }
 
-.SearchHolder .search-btn {
+.LandingPage .SearchHolder .search-btn {
     position: absolute;
     font-size: 36px;
     bottom: 20px;
@@ -87,19 +82,18 @@
     color: #ddd;
 }
 
-.SearchHolder .search-btn:hover {    
+.LandingPage .SearchHolder .search-btn:hover {    
     font-weight: bold;
     color: #fff;
 }
 
-.BusDataHolder {
+.LandingPage .BusDataHolder {
     width: 850px;
     margin-top: 40px;
     border-top: 4px solid #ddd;
 }
 
-.BusDataHolder #busStatGraph {
+.LandingPage .BusDataHolder #busStatGraph {
     background: black;
     width: 850px;
-    
 }
